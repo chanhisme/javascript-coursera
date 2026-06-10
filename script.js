@@ -1,28 +1,55 @@
-function upDate(previewPic) {
-    // 1. Check that the mouseover event is triggering
-    console.log("Mouseover event triggered!");
-    
-    // 2. Print out information about the previewPic variable (alt and src)
-    console.log("Source URL: " + previewPic.src);
-    console.log("Alt Text: " + previewPic.alt);
-    
-    // 3. Find the element with the id of 'image'
+// ── onload: runs as soon as the page finishes loading ───────────────────────
+window.onload = function addTabIndex() {
+    // 1. Confirm the event fires
+    console.log("Page loaded — adding tabindex to all figures.");
+
+    // 2. Grab every <figure> element in the gallery
+    const figures = document.querySelectorAll("figure");
+
+    // 3. Loop through each figure and make it keyboard-focusable
+    for (let i = 0; i < figures.length; i++) {
+        figures[i].setAttribute("tabindex", "0");
+        console.log("tabindex added to figure #" + (i + 1));
+    }
+};
+
+// ── upDate: called on mouseover AND onfocus ──────────────────────────────────
+function upDate(figureOrImg) {
+    console.log("upDate event triggered!");
+
+    // Accept either a <figure> or an <img> (both patterns work)
+    let img;
+    if (figureOrImg.tagName.toLowerCase() === "figure") {
+        img = figureOrImg.querySelector("img.preview-img");
+    } else {
+        img = figureOrImg;
+    }
+
+    if (!img) return;
+
+    console.log("Source URL: " + img.src);
+    console.log("Alt Text:   " + img.alt);
+
     let targetBox = document.getElementById("image");
-    
-    // 4. Change the text of the element to the alt text of the preview image
-    targetBox.innerHTML = previewPic.alt;
-    
-    // 5. Change the background image of the element to the source of the preview image
-    targetBox.style.backgroundImage = "url('" + previewPic.src + "')";
+
+    // Update the caption text inside the preview box
+    targetBox.querySelector("span").textContent = img.alt;
+
+    // Update the background image
+    targetBox.style.backgroundImage = "url('" + img.src + "')";
+
+    // Update the aria-label so screen readers announce the new photo
+    targetBox.setAttribute("aria-label", "Preview: " + img.alt);
 }
 
+// ── unDo: called on mouseleave AND onblur ────────────────────────────────────
 function unDo() {
-    // 1. Find the element with the id of 'image'
+    console.log("unDo event triggered — resetting preview.");
+
     let targetBox = document.getElementById("image");
-    
-    // 2. Update the url for the background image back to the original value
+
     targetBox.style.backgroundImage = "url('')";
-    
-    // 3. Update the text back to the original default message
-    targetBox.innerHTML = "Hover over an image below to display here.";
+    targetBox.querySelector("span").textContent =
+        "Hover over or focus an image below to preview it here.";
+    targetBox.setAttribute("aria-label", "Photo preview area");
 }
